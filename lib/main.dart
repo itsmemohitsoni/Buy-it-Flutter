@@ -1,6 +1,4 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter2/models/items.dart';
 import 'package:flutter2/pages/cart_page.dart';
 import 'package:flutter2/pages/drawer.dart';
@@ -25,6 +23,7 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: ThemeMode.system,
       home: const WelcomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -45,6 +44,8 @@ class _WelcomePageState extends State<WelcomePage> {
   void initState() {
     super.initState();
 
+    checkLogin();
+
     Future.delayed(const Duration(milliseconds: 1000), () {
       setState(() {
         _welcomeOpacity = 1;
@@ -56,6 +57,22 @@ class _WelcomePageState extends State<WelcomePage> {
         _loginOpacity = 1;
       });
     });
+
+    Future.delayed(const Duration(milliseconds: 3000), () {
+      if(showLoginPref){
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MyHomePage(),
+          ),
+        );
+      }
+    });
+  }
+
+  Future<void> checkLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    showLoginPref = prefs.containsKey('Name');
   }
 
   @override
@@ -84,7 +101,8 @@ class _WelcomePageState extends State<WelcomePage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 12.0),
+                padding:
+                    const EdgeInsets.only(left: 24.0, right: 24.0, top: 12.0),
                 child: Image.asset(
                   'assets/images/welcome_image.png',
                   fit: BoxFit.fill,
@@ -94,11 +112,12 @@ class _WelcomePageState extends State<WelcomePage> {
               const SizedBox(
                 height: 20,
               ),
-              AnimatedOpacity(
-                duration: const Duration(seconds: 3),
-                opacity: _loginOpacity,
-                child: const LoginPage(),
-              )
+              if(showLoginPref == false)
+                AnimatedOpacity(
+                  duration: const Duration(seconds: 3),
+                  opacity: _loginOpacity,
+                  child: const LoginPage(),
+                ),
             ],
           ),
         ),
@@ -124,7 +143,11 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         const Padding(
           padding: EdgeInsets.only(left: 0),
-          child: Text('Enter Login details', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'posh'),),
+          child: Text(
+            'Enter Login details',
+            style: TextStyle(
+                fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'posh'),
+          ),
         ),
         const SizedBox(
           height: 10,
@@ -132,13 +155,17 @@ class _LoginPageState extends State<LoginPage> {
         Center(
           child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
-            child:  TextField(
+            child: TextField(
               decoration: InputDecoration(
                 hintText: 'Enter your name',
                 labelText: 'Name',
-                suffixIcon: Icon(Icons.home, color: Colors.deepPurple.shade600,),
+                suffixIcon: Icon(
+                  Icons.home,
+                  color: Colors.deepPurple.shade600,
+                ),
                 border: const OutlineInputBorder(),
               ),
+              textCapitalization: TextCapitalization.words,
               onChanged: (value) {
                 name = value;
               },
@@ -151,13 +178,17 @@ class _LoginPageState extends State<LoginPage> {
         Center(
           child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
-            child:  TextField(
+            child: TextField(
               decoration: InputDecoration(
                 hintText: 'Enter your email',
                 labelText: 'Email',
-                suffixIcon: Icon(Icons.email, color: Colors.deepPurple.shade600,),
+                suffixIcon: Icon(
+                  Icons.email,
+                  color: Colors.deepPurple.shade600,
+                ),
                 border: const OutlineInputBorder(),
               ),
+              keyboardType: TextInputType.emailAddress,
               onChanged: (value) {
                 email = value;
               },
@@ -170,15 +201,19 @@ class _LoginPageState extends State<LoginPage> {
         Center(
           child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
-            child:  TextField(
+            child: TextField(
               decoration: InputDecoration(
                 hintText: 'Enter your phone number',
                 labelText: 'Contact',
-                suffixIcon: Icon(Icons.call, color: Colors.deepPurple.shade600,),
+                suffixIcon: Icon(
+                  Icons.call,
+                  color: Colors.deepPurple.shade600,
+                ),
                 border: const OutlineInputBorder(),
               ),
+              keyboardType: TextInputType.phone,
               onChanged: (value) {
-                email = value;
+                mobile = value;
               },
             ),
           ),
@@ -188,11 +223,35 @@ class _LoginPageState extends State<LoginPage> {
         ),
         Center(
           child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple.shade600,
+              foregroundColor: Colors.white,
+              elevation: 10.0,
+              shadowColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () async{
+              if(name == '' || email == '' || mobile == ''){
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter all details'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }else{
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString('Name', name);
+                prefs.setString('Email', email);
+                prefs.setString('Mobile num', mobile);
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const MyHomePage()));
+                    builder: (context) => const MyHomePage(),
+                  ),
+                );
+              }
             },
             child: const Text('Login'),
           ),

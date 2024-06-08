@@ -27,7 +27,7 @@ class _MyDrawerState extends State<MyDrawer> {
             color: Colors.blue,
             child: const Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text('My Drawer', style: TextStyle(fontSize: 22,color: Colors.white, fontFamily: "normal"),),
+              child: Text('Seller\'s Details', style: TextStyle(fontSize: 22,color: Colors.white, fontFamily: "normal"),),
             ),
           ),
           const SizedBox(height: 10,),
