@@ -1,6 +1,9 @@
-# flutter2
+# Buy-it
+Prototype of a Buy app.
 
-A new Flutter project.
+## Demo Video
+https://github.com/itsmemohitsoni/Buy-it-Flutter/assets/96100173/f9724ad5-6756-4c0a-a1e7-dcaba4dd6a7d
+
 
 ## Getting Started
 
